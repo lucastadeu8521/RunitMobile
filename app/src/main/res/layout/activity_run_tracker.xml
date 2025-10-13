@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/top_panel"
+        android:layout_width="match_parent"
+        android:layout_height="220dp"
+        android:background="#215FB8"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/tvIcon"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:src="@drawable/logo_image" />
+
+        <TextView
+            android:id="@+id/tvDurationLarge"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="00:00:00"
+            android:textColor="#FFFFFF"
+            android:textSize="40sp" />
+
+        <TextView
+            android:id="@+id/tvDuration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Duração"
+            android:textColor="#FFFFFF"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/stats_panel"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/top_panel"
+        android:padding="12dp"
+        android:background="#FFFFFF"
+        android:gravity="center_horizontal"
+        android:elevation="4dp">
+
+        <TextView
+            android:id="@+id/tvDistance"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:text="0.00 km"
+            android:textColor="#000000"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="40dp"
+            android:background="#CCCCCC"
+            android:layout_gravity="center"/>
+
+        <TextView
+            android:id="@+id/tvPace"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:text="00:00 /km"
+            android:textColor="#000000"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="40dp"
+            android:background="#CCCCCC"
+            android:layout_gravity="center"/>
+
+        <TextView
+            android:id="@+id/tvCalories"
+            android:layout_width="0dp"
+            android:layout_height="60dp"
+            android:layout_weight="1"
+            android:text="0 cal"
+            android:textColor="#000000"
+            android:gravity="center"
+            android:textSize="16sp"
+            android:textStyle="bold"/>
+    </LinearLayout>
+
+    <fragment
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_below="@id/stats_panel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/bottom_panel"/>
+
+    <LinearLayout
+        android:id="@+id/bottom_panel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/bg_bottom_nav_pill"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:elevation="8dp">
+
+        <ImageButton
+            android:id="@+id/btnDashboard"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:padding="14dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Abrir Dashboard"
+            android:src="@android:drawable/ic_menu_sort_by_size"
+            android:scaleType="centerInside" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/btnStartPause"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@drawable/button_circle"
+            android:contentDescription="Iniciar/Pausar Tracking"
+            android:padding="16dp"
+            android:scaleType="centerInside"
+            android:src="@android:drawable/ic_media_play" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <ImageButton
+            android:id="@+id/btnStop"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:padding="14dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Parar e Salvar Corrida"
+            android:src="@drawable/ic_stop_square"
+            android:scaleType="centerInside" />
+
+    </LinearLayout>
+
+    <Chronometer
+        android:id="@+id/chronometer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"/>
+
+</RelativeLayout>

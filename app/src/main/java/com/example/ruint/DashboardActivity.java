@@ -1,11 +1,15 @@
 package com.example.ruint;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.MenuItem;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
@@ -31,6 +35,7 @@ public class DashboardActivity extends AppCompatActivity {
         setContentView(R.layout.activity_dashboard);
 
         initializeViews();
+        setupBottomNavigation();
         loadSavedRuns();
         setupRecyclerView();
         updateDashboard();
@@ -45,6 +50,30 @@ public class DashboardActivity extends AppCompatActivity {
         rvRuns = findViewById(R.id.rvRuns);
 
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+    }
+
+    private void setupBottomNavigation() {
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setSelectedItemId(R.id.perfil);
+
+        bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int itemId = item.getItemId();
+                if (itemId == R.id.run) {
+                    startActivity(new Intent(getApplicationContext(), RunTrackerActivity.class));
+                    overridePendingTransition(0, 0);
+                    return true;
+                } else if (itemId == R.id.historico) {
+                    startActivity(new Intent(getApplicationContext(), RunHistoryActivity.class));
+                    overridePendingTransition(0, 0);
+                    return true;
+                } else if (itemId == R.id.perfil) {
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     private void setupRecyclerView() {

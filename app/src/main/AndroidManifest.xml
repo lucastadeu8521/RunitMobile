@@ -25,6 +25,9 @@
         android:name=".RunTrackerActivity"
         android:exported="false" />
         <activity
+            android:name=".RunHistoryActivity"
+            android:exported="false" />
+        <activity
             android:name=".DashboardActivity"
             android:label="Dashboard"
             android:exported="true" />

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -98,35 +99,35 @@
     <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_below="@id/stats_panel"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/bottom_panel"/>
+        android:layout_below="@id/stats_panel"
+        android:layout_above="@id/bottom_panel" />
 
     <LinearLayout
         android:id="@+id/bottom_panel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@id/bottomNavigationView"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:layout_marginBottom="20dp"
+        android:layout_marginBottom="16dp"
         android:background="@drawable/bg_bottom_nav_pill"
+        android:elevation="8dp"
         android:gravity="center"
         android:orientation="horizontal"
         android:paddingStart="12dp"
-        android:paddingEnd="12dp"
-        android:elevation="8dp">
+        android:paddingEnd="12dp">
 
         <ImageButton
             android:id="@+id/btnDashboard"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:padding="14dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Abrir Dashboard"
-            android:src="@android:drawable/ic_menu_sort_by_size"
-            android:scaleType="centerInside" />
+            android:padding="14dp"
+            android:scaleType="centerInside"
+            android:src="@android:drawable/ic_menu_sort_by_size" />
 
         <Space
             android:layout_width="0dp"
@@ -152,13 +153,20 @@
             android:id="@+id/btnStop"
             android:layout_width="80dp"
             android:layout_height="80dp"
-            android:padding="14dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="Parar e Salvar Corrida"
-            android:src="@drawable/ic_stop_square"
-            android:scaleType="centerInside" />
+            android:padding="14dp"
+            android:scaleType="centerInside"
+            android:src="@drawable/ic_stop_square" />
 
     </LinearLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigationView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        app:menu="@menu/bottom_nav" />
 
     <Chronometer
         android:id="@+id/chronometer"

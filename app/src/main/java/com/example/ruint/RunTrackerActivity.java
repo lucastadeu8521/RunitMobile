@@ -9,6 +9,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -33,6 +34,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -132,6 +134,7 @@ public class RunTrackerActivity extends AppCompatActivity implements OnMapReadyC
         setContentView(R.layout.activity_run_tracker);
 
         initializeViews();
+        setupBottomNavigation();
         setupClickListeners();
         setupDashboardButton();
         setupBackPressedHandler();
@@ -161,6 +164,30 @@ public class RunTrackerActivity extends AppCompatActivity implements OnMapReadyC
         btnStop = findViewById(R.id.btnStop);
 
         updateButtonStates();
+    }
+
+    private void setupBottomNavigation() {
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottomNavigationView);
+        bottomNavigationView.setSelectedItemId(R.id.run);
+
+        bottomNavigationView.setOnItemSelectedListener(new BottomNavigationView.OnItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int itemId = item.getItemId();
+                if (itemId == R.id.run) {
+                    return true;
+                } else if (itemId == R.id.historico) {
+                    startActivity(new Intent(getApplicationContext(), RunHistoryActivity.class));
+                    overridePendingTransition(0, 0);
+                    return true;
+                } else if (itemId == R.id.perfil) {
+                    startActivity(new Intent(getApplicationContext(), DashboardActivity.class));
+                    overridePendingTransition(0, 0);
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     private void setupClickListeners() {

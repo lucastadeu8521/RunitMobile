@@ -27,5 +27,4 @@
         android:padding="12dp"
         android:backgroundTint="#2196F3"
         android:textColor="#FFF" />
-
 </LinearLayout>

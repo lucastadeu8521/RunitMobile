@@ -22,8 +22,8 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyCekmq5UOIP4VPtneSs1ihk-1VjS0eJ3ww" />
         <activity
-        android:name=".RunTrackerActivity"
-        android:exported="false" />
+            android:name=".RunTrackerActivity"
+            android:exported="false" />
         <activity
             android:name=".RunHistoryActivity"
             android:exported="false" />
@@ -33,6 +33,12 @@
             android:exported="true" />
         <activity
             android:name=".MainActivity"
+            android:exported="true" />
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="true" />
+        <activity
+            android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

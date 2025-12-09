@@ -65,9 +65,8 @@
             android:text="Marcar"
             android:textAllCaps="false"
             android:layout_marginTop="10dp"
-            android:backgroundTint="@color/teal_700"
+            android:backgroundTint="@color/teal"
             android:textColor="@android:color/white" />
 
     </LinearLayout>
-
 </androidx.cardview.widget.CardView>

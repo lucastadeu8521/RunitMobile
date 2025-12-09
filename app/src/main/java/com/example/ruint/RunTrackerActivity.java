@@ -3,7 +3,6 @@ package com.example.ruint;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -35,13 +34,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import com.example.ruint.api.SessionManager;
 
 public class RunTrackerActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -63,6 +61,7 @@ public class RunTrackerActivity extends AppCompatActivity implements OnMapReadyC
     private ImageButton btnStartPause, btnDashboard, btnStop;
     private boolean tracking = false;
     private boolean hasPermissions = false;
+    private SessionManager sessionManager;
 
     private final LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -133,6 +132,7 @@ public class RunTrackerActivity extends AppCompatActivity implements OnMapReadyC
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_run_tracker);
 
+        sessionManager = new SessionManager(this);
         initializeViews();
         setupBottomNavigation();
         setupClickListeners();
@@ -393,41 +393,7 @@ public class RunTrackerActivity extends AppCompatActivity implements OnMapReadyC
 
     private void saveRunData(double distanceKm, long duration, double averagePace, double calories, long startedAtMillis) {
         RunData runData = new RunData(distanceKm, duration, averagePace, calories);
-        saveRunToSharedPreferences(runData);
-    }
-
-    private void saveRunToSharedPreferences(RunData runData) {
-        try {
-            SharedPreferences prefs = getSharedPreferences("RunTrackerPrefs", MODE_PRIVATE);
-            Gson gson = new Gson();
-
-            String runsJson = prefs.getString("saved_runs", "");
-            List<RunData> runs = new ArrayList<>();
-
-            if (!runsJson.isEmpty()) {
-                try {
-                    Type type = new TypeToken<List<RunData>>() {}.getType();
-                    runs = gson.fromJson(runsJson, type);
-                    if (runs == null) {
-                        runs = new ArrayList<>();
-                    }
-                } catch (Exception e) {
-                    Log.e(TAG, "Error parsing runs JSON: " + e.getMessage());
-                    runs = new ArrayList<>();
-                }
-            }
-
-            runs.add(runData);
-            String updatedRunsJson = gson.toJson(runs);
-            prefs.edit().putString("saved_runs", updatedRunsJson).apply();
-
-            Log.d(TAG, "Run saved successfully: " + runData.getFormattedDistance() + " - " + runData.getFormattedDuration());
-            Log.d(TAG, "Total runs saved: " + runs.size());
-
-        } catch (Exception e) {
-            Log.e(TAG, "Error saving run: " + e.getMessage());
-            Toast.makeText(this, "Erro ao salvar corrida", Toast.LENGTH_SHORT).show();
-        }
+        sessionManager.addRun(runData);
     }
 
     @Override

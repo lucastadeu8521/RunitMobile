@@ -37,20 +37,11 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.example.ruint.api.ApiClient;
-import com.example.ruint.api.ApiService;
-import com.example.ruint.api.SessionManager;
-import com.example.ruint.api.dto.RunningSessionRequest;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.text.SimpleDateFormat;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class RunTrackerActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -72,8 +63,6 @@ public class RunTrackerActivity extends AppCompatActivity implements OnMapReadyC
     private ImageButton btnStartPause, btnDashboard, btnStop;
     private boolean tracking = false;
     private boolean hasPermissions = false;
-    private ApiService apiService;
-    private SessionManager sessionManager;
 
     private final LocationCallback locationCallback = new LocationCallback() {
         @Override
@@ -149,8 +138,6 @@ public class RunTrackerActivity extends AppCompatActivity implements OnMapReadyC
         setupClickListeners();
         setupDashboardButton();
         setupBackPressedHandler();
-        sessionManager = new SessionManager(this);
-        apiService = ApiClient.getService(this);
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
@@ -407,7 +394,6 @@ public class RunTrackerActivity extends AppCompatActivity implements OnMapReadyC
     private void saveRunData(double distanceKm, long duration, double averagePace, double calories, long startedAtMillis) {
         RunData runData = new RunData(distanceKm, duration, averagePace, calories);
         saveRunToSharedPreferences(runData);
-        sendSessionToApi(runData, startedAtMillis);
     }
 
     private void saveRunToSharedPreferences(RunData runData) {
@@ -442,43 +428,6 @@ public class RunTrackerActivity extends AppCompatActivity implements OnMapReadyC
             Log.e(TAG, "Error saving run: " + e.getMessage());
             Toast.makeText(this, "Erro ao salvar corrida", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private void sendSessionToApi(RunData runData, long startedAtMillis) {
-        if (apiService == null || sessionManager == null || !sessionManager.isLoggedIn()) {
-            return;
-        }
-
-        String startedAt = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.getDefault())
-                .format(new Date(startedAtMillis));
-
-        RunningSessionRequest request = new RunningSessionRequest(
-                null,
-                startedAt,
-                runData.getDuration(),
-                runData.getDistance() * 1000,
-                runData.getAveragePace(),
-                null,
-                null,
-                null,
-                true
-        );
-
-        apiService.createSession(request).enqueue(new retrofit2.Callback<com.example.ruint.api.dto.RunningSessionResponse>() {
-            @Override
-            public void onResponse(Call<com.example.ruint.api.dto.RunningSessionResponse> call, retrofit2.Response<com.example.ruint.api.dto.RunningSessionResponse> response) {
-                if (response.isSuccessful()) {
-                    Log.d(TAG, "Session synced with API");
-                } else {
-                    Log.w(TAG, "Session not saved on server: " + response.code());
-                }
-            }
-
-            @Override
-            public void onFailure(Call<com.example.ruint.api.dto.RunningSessionResponse> call, Throwable t) {
-                Log.e(TAG, "Failed to sync session: " + t.getMessage());
-            }
-        });
     }
 
     @Override

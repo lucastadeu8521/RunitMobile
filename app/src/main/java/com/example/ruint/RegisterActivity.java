@@ -10,22 +10,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.ruint.api.ApiClient;
-import com.example.ruint.api.ApiService;
 import com.example.ruint.api.SessionManager;
-import com.example.ruint.api.dto.LoginRequest;
-import com.example.ruint.api.dto.LoginResponse;
-import com.example.ruint.api.dto.RegisterRequest;
-import com.example.ruint.api.dto.UserResponseDto;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class RegisterActivity extends AppCompatActivity {
 
     private SessionManager sessionManager;
-    private ApiService apiService;
     private EditText etName;
     private EditText etEmail;
     private EditText etPassword;
@@ -37,7 +26,6 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
         sessionManager = new SessionManager(this);
-        apiService = ApiClient.getService(this);
 
         etName = findViewById(R.id.etName);
         etEmail = findViewById(R.id.etEmail);
@@ -60,18 +48,7 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
-            RegisterRequest request = new RegisterRequest(
-                    name,
-                    name,
-                    "1990-01-01",
-                    "OTHER",
-                    "UTC",
-                    "pt-BR",
-                    email,
-                    password
-            );
-
-            executeRegister(request, email, password);
+            executeRegister(name, email, password);
         });
 
         tvLogin.setOnClickListener(v -> finish());
@@ -84,45 +61,17 @@ public class RegisterActivity extends AppCompatActivity {
         finish();
     }
 
-    private void executeRegister(RegisterRequest request, String email, String password) {
+    private void executeRegister(String name, String email, String password) {
         btnRegister.setEnabled(false);
 
-        apiService.register(request).enqueue(new Callback<UserResponseDto>() {
-            @Override
-            public void onResponse(Call<UserResponseDto> call, Response<UserResponseDto> response) {
-                btnRegister.setEnabled(true);
-                if (response.isSuccessful()) {
-                    Toast.makeText(RegisterActivity.this, "Cadastro realizado", Toast.LENGTH_SHORT).show();
-                    performLoginAfterRegister(email, password);
-                } else {
-                    Toast.makeText(RegisterActivity.this, "Erro ao registrar usuário", Toast.LENGTH_SHORT).show();
-                }
-            }
+        if (sessionManager.hasUser() && !email.equalsIgnoreCase(sessionManager.getUserEmail())) {
+            Toast.makeText(this, "Um usuário local já está cadastrado", Toast.LENGTH_SHORT).show();
+            btnRegister.setEnabled(true);
+            return;
+        }
 
-            @Override
-            public void onFailure(Call<UserResponseDto> call, Throwable t) {
-                btnRegister.setEnabled(true);
-                Toast.makeText(RegisterActivity.this, "Falha de comunicação com servidor", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void performLoginAfterRegister(String email, String password) {
-        apiService.login(new LoginRequest(email, password)).enqueue(new Callback<LoginResponse>() {
-            @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    sessionManager.saveAuthSession(response.body());
-                    navigateToDashboard();
-                } else {
-                    Toast.makeText(RegisterActivity.this, "Não foi possível entrar após cadastro", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
-                Toast.makeText(RegisterActivity.this, "Erro ao autenticar", Toast.LENGTH_SHORT).show();
-            }
-        });
+        sessionManager.saveLocalUser(name, email, password);
+        Toast.makeText(RegisterActivity.this, "Cadastro realizado localmente", Toast.LENGTH_SHORT).show();
+        navigateToDashboard();
     }
 }

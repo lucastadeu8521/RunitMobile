@@ -12,21 +12,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.example.ruint.api.ApiClient;
-import com.example.ruint.api.ApiService;
-import com.example.ruint.api.SessionManager;
-import com.example.ruint.api.dto.RunningSessionResponse;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class DashboardActivity extends AppCompatActivity {
 
@@ -37,8 +26,6 @@ public class DashboardActivity extends AppCompatActivity {
     private List<RunData> allRuns = new ArrayList<>();
 
     private SharedPreferences sharedPreferences;
-    private ApiService apiService;
-    private SessionManager sessionManager;
     private static final String PREFS_NAME = "RunTrackerPrefs";
     private static final String RUNS_KEY = "saved_runs";
     private static final double DEFAULT_WEIGHT_KG = 70.0;
@@ -51,7 +38,6 @@ public class DashboardActivity extends AppCompatActivity {
         initializeViews();
         setupBottomNavigation();
         loadSavedRuns();
-        loadRemoteRuns();
         setupRecyclerView();
         updateDashboard();
     }
@@ -65,8 +51,6 @@ public class DashboardActivity extends AppCompatActivity {
         rvRuns = findViewById(R.id.rvRuns);
 
         sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        sessionManager = new SessionManager(this);
-        apiService = ApiClient.getService(this);
     }
 
     private void setupBottomNavigation() {
@@ -109,67 +93,6 @@ public class DashboardActivity extends AppCompatActivity {
                 allRuns.addAll(savedRuns);
             }
         }
-    }
-
-    private void loadRemoteRuns() {
-        if (!sessionManager.isLoggedIn()) {
-            return;
-        }
-
-        apiService.getSessions().enqueue(new Callback<List<RunningSessionResponse>>() {
-            @Override
-            public void onResponse(Call<List<RunningSessionResponse>> call, Response<List<RunningSessionResponse>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<RunData> remoteRuns = new ArrayList<>();
-                    for (RunningSessionResponse session : response.body()) {
-                        remoteRuns.add(mapSessionToRun(session));
-                    }
-                    allRuns.clear();
-                    allRuns.addAll(remoteRuns);
-                    saveRunsToPrefs();
-                    updateDashboard();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<RunningSessionResponse>> call, Throwable t) {
-                // Keep offline data if API fails
-            }
-        });
-    }
-
-    private RunData mapSessionToRun(RunningSessionResponse session) {
-        RunData runData = new RunData();
-        runData.setId(session.getId() != null ? String.valueOf(session.getId()) : String.valueOf(System.currentTimeMillis()));
-        double distanceKm = session.getDistanceMeters() != null ? session.getDistanceMeters() / 1000.0 : 0.0;
-        runData.setDistance(distanceKm);
-        runData.setDuration(session.getElapsedSeconds() != null ? session.getElapsedSeconds() : 0);
-        runData.setAveragePace(session.getPaceMinPerKm() != null ? session.getPaceMinPerKm() : 0.0);
-
-        long timestamp = parseSessionDate(session.getStartedAt());
-        runData.setTimestamp(timestamp);
-        runData.setDateString(new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault()).format(new Date(timestamp)));
-
-        double hours = runData.getDuration() / 3600.0;
-        double calories = DEFAULT_WEIGHT_KG * 8.0 * hours;
-        runData.setCalories(calories);
-
-        return runData;
-    }
-
-    private long parseSessionDate(String dateString) {
-        if (dateString == null) {
-            return System.currentTimeMillis();
-        }
-        try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX", Locale.getDefault());
-            Date parsed = dateFormat.parse(dateString);
-            if (parsed != null) {
-                return parsed.getTime();
-            }
-        } catch (ParseException ignored) {
-        }
-        return System.currentTimeMillis();
     }
 
     private void updateDashboard() {

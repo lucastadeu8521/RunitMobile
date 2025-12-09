@@ -1,7 +1,6 @@
 package com.example.ruint;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -10,9 +9,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import java.lang.reflect.Type;
+
+import com.example.ruint.api.SessionManager;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -25,16 +24,14 @@ public class DashboardActivity extends AppCompatActivity {
     private RunAdapter runAdapter;
     private List<RunData> allRuns = new ArrayList<>();
 
-    private SharedPreferences sharedPreferences;
-    private static final String PREFS_NAME = "RunTrackerPrefs";
-    private static final String RUNS_KEY = "saved_runs";
-    private static final double DEFAULT_WEIGHT_KG = 70.0;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
+        sessionManager = new SessionManager(this);
         initializeViews();
         setupBottomNavigation();
         loadSavedRuns();
@@ -49,8 +46,6 @@ public class DashboardActivity extends AppCompatActivity {
         tvRecentDistance = findViewById(R.id.tvRecentDistance);
         tvRecentPace = findViewById(R.id.tvRecentPace);
         rvRuns = findViewById(R.id.rvRuns);
-
-        sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
     }
 
     private void setupBottomNavigation() {
@@ -84,15 +79,9 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void loadSavedRuns() {
-        String runsJson = sharedPreferences.getString(RUNS_KEY, "");
-        if (!runsJson.isEmpty()) {
-            Gson gson = new Gson();
-            Type type = new TypeToken<List<RunData>>() {}.getType();
-            List<RunData> savedRuns = gson.fromJson(runsJson, type);
-            if (savedRuns != null) {
-                allRuns.addAll(savedRuns);
-            }
-        }
+        List<RunData> savedRuns = sessionManager.getSavedRuns();
+        allRuns.clear();
+        allRuns.addAll(savedRuns);
     }
 
     private void updateDashboard() {
@@ -159,9 +148,7 @@ public class DashboardActivity extends AppCompatActivity {
     }
 
     private void saveRunsToPrefs() {
-        Gson gson = new Gson();
-        String runsJson = gson.toJson(allRuns);
-        sharedPreferences.edit().putString(RUNS_KEY, runsJson).apply();
+        sessionManager.saveRuns(allRuns);
     }
 
     @Override

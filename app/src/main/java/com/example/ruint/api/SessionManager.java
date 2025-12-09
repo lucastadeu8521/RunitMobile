@@ -10,7 +10,9 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SessionManager {
 
@@ -21,6 +23,7 @@ public class SessionManager {
     private static final String KEY_USER_ID = "user_id";
     private static final String KEY_USER_PASSWORD = "user_password";
     private static final String KEY_RUNS = "saved_runs";
+    private static final String KEY_MARKED_RUNS = "marked_runs";
 
     private final SharedPreferences sharedPreferences;
     private final Gson gson = new Gson();
@@ -108,6 +111,26 @@ public class SessionManager {
     public void saveRuns(List<RunData> runs) {
         String runsJson = gson.toJson(runs);
         sharedPreferences.edit().putString(KEY_RUNS, runsJson).apply();
+    }
+
+    public Set<String> getMarkedRunIds() {
+        String markedJson = sharedPreferences.getString(KEY_MARKED_RUNS, "");
+        if (TextUtils.isEmpty(markedJson)) {
+            return new HashSet<>();
+        }
+
+        try {
+            Type type = new TypeToken<Set<String>>() {}.getType();
+            Set<String> marked = gson.fromJson(markedJson, type);
+            return marked != null ? marked : new HashSet<>();
+        } catch (Exception e) {
+            return new HashSet<>();
+        }
+    }
+
+    public void saveMarkedRunIds(Set<String> markedIds) {
+        String markedJson = gson.toJson(markedIds);
+        sharedPreferences.edit().putString(KEY_MARKED_RUNS, markedJson).apply();
     }
 
     private String generateLocalToken() {

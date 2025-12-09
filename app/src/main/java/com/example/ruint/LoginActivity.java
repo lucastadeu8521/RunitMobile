@@ -10,20 +10,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.ruint.api.ApiClient;
-import com.example.ruint.api.ApiService;
 import com.example.ruint.api.SessionManager;
-import com.example.ruint.api.dto.LoginRequest;
-import com.example.ruint.api.dto.LoginResponse;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class LoginActivity extends AppCompatActivity {
 
     private SessionManager sessionManager;
-    private ApiService apiService;
     private Button btnLogin;
     private EditText etEmail;
     private EditText etPassword;
@@ -34,7 +25,6 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         sessionManager = new SessionManager(this);
-        apiService = ApiClient.getService(this);
 
         if (sessionManager.isLoggedIn()) {
             navigateToDashboard();
@@ -74,25 +64,14 @@ public class LoginActivity extends AppCompatActivity {
     private void performLogin(String email, String password) {
         btnLogin.setEnabled(false);
 
-        apiService.login(new LoginRequest(email, password)).enqueue(new Callback<LoginResponse>() {
-            @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                btnLogin.setEnabled(true);
+        boolean authenticated = sessionManager.authenticate(email, password);
+        btnLogin.setEnabled(true);
 
-                if (response.isSuccessful() && response.body() != null) {
-                    sessionManager.saveAuthSession(response.body());
-                    Toast.makeText(LoginActivity.this, "Login realizado com sucesso", Toast.LENGTH_SHORT).show();
-                    navigateToDashboard();
-                } else {
-                    Toast.makeText(LoginActivity.this, "Credenciais inválidas", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
-                btnLogin.setEnabled(true);
-                Toast.makeText(LoginActivity.this, "Erro ao conectar-se ao servidor", Toast.LENGTH_SHORT).show();
-            }
-        });
+        if (authenticated) {
+            Toast.makeText(LoginActivity.this, "Login realizado com sucesso", Toast.LENGTH_SHORT).show();
+            navigateToDashboard();
+        } else {
+            Toast.makeText(LoginActivity.this, "Credenciais inválidas ou usuário não cadastrado", Toast.LENGTH_SHORT).show();
+        }
     }
 }

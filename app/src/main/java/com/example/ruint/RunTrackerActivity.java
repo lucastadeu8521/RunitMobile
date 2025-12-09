@@ -210,6 +210,8 @@ public class RunTrackerActivity extends AppCompatActivity implements OnMapReadyC
         });
     }
 
+
+
     private void setupDashboardButton() {
         btnDashboard.setOnClickListener(v -> {
             Log.d(TAG, "Dashboard button clicked");
@@ -293,14 +295,7 @@ public class RunTrackerActivity extends AppCompatActivity implements OnMapReadyC
     }
 
     private void showStopConfirmationDialog() {
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Finalizar Corrida")
-                .setMessage("Deseja parar e salvar esta corrida?")
-                .setPositiveButton("Salvar", (dialog, which) -> {
-                    stopTracking();
-                })
-                .setNegativeButton("Continuar", null)
-                .show();
+        stopTracking();
     }
 
     private void stopTracking() {
